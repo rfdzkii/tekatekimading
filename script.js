@@ -413,17 +413,19 @@ document.getElementById('cw-check').addEventListener('click', () => {
   }, 1600);
 });
 
-// ===============================
-// HINT — maksimal 3 kali per puzzle
-// ===============================
-
-let cwHintsLeft = 3;
-
+// Tombol "Hint": maksimal 3 kali
 const cwHintBtn = document.getElementById('cw-hint');
+
+function updateHintButton() {
+  cwHintBtn.textContent = `Hint (${cwHintsLeft})`;
+  cwHintBtn.disabled = cwHintsLeft <= 0;
+}
+
+updateHintButton();
 
 cwHintBtn.addEventListener('click', () => {
 
-  // Kalau hint sudah habis, jangan lakukan apa-apa
+  // Hint sudah habis
   if (cwHintsLeft <= 0) return;
 
   for (let r = 0; r < cwRows; r++) {
@@ -436,20 +438,17 @@ cwHintBtn.addEventListener('click', () => {
       if (input.value !== cwGrid[r][c]) {
 
         input.value = cwGrid[r][c];
+
         input.closest('.cw-cell').classList.add('hinted');
 
-        // Kurangi jumlah hint
+        // 1 hint terpakai
         cwHintsLeft--;
+        cwHintsUsed++;
 
-        // Update tulisan tombol
-        cwHintBtn.textContent = `Hint (${cwHintsLeft})`;
-
-        // Kalau habis, matikan tombol
-        if (cwHintsLeft === 0) {
-          cwHintBtn.disabled = true;
-        }
+        updateHintButton();
 
         checkCwSilently();
+
         return;
       }
     }
@@ -481,6 +480,38 @@ function initCrossword() {
   selectCwCell(first.row, first.col, first.dir);
 }
 
+function resetCrossword() {
+  document.querySelectorAll('#crossword-grid input').forEach(inp => {
+    inp.value = '';
+  });
+
+  document.querySelectorAll('#crossword-grid .cw-cell').forEach(el =>
+    el.classList.remove(
+      'correct',
+      'incorrect',
+      'hinted',
+      'in-word',
+      'current'
+    )
+  );
+
+  document.getElementById('cw-feedback').textContent = '';
+
+  cwScore = 0;
+  cwWon = false;
+
+  cwHintsLeft = 3;
+  cwHintsUsed = 0;
+  updateHintButton();
+
+  document.getElementById('cw-score').textContent = '0';
+
+  cwTimer.reset();
+  cwTimer.start();
+
+  const first = CROSSWORD_WORDS[0];
+  selectCwCell(first.row, first.col, first.dir);
+}
 
 /* ================================================================
    3. GAME 2 — CARI KATA (WORD SEARCH)
