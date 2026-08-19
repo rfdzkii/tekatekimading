@@ -413,15 +413,42 @@ document.getElementById('cw-check').addEventListener('click', () => {
   }, 1600);
 });
 
-// Tombol "Hint": ungkap satu huruf yang masih kosong/salah
-document.getElementById('cw-hint').addEventListener('click', () => {
+// ===============================
+// HINT — maksimal 3 kali per puzzle
+// ===============================
+
+let cwHintsLeft = 3;
+
+const cwHintBtn = document.getElementById('cw-hint');
+
+cwHintBtn.addEventListener('click', () => {
+
+  // Kalau hint sudah habis, jangan lakukan apa-apa
+  if (cwHintsLeft <= 0) return;
+
   for (let r = 0; r < cwRows; r++) {
     for (let c = 0; c < cwCols; c++) {
+
       if (cwGrid[r][c] === null) continue;
+
       const input = cwInputEl(r, c);
+
       if (input.value !== cwGrid[r][c]) {
+
         input.value = cwGrid[r][c];
         input.closest('.cw-cell').classList.add('hinted');
+
+        // Kurangi jumlah hint
+        cwHintsLeft--;
+
+        // Update tulisan tombol
+        cwHintBtn.textContent = `Hint (${cwHintsLeft})`;
+
+        // Kalau habis, matikan tombol
+        if (cwHintsLeft === 0) {
+          cwHintBtn.disabled = true;
+        }
+
         checkCwSilently();
         return;
       }
