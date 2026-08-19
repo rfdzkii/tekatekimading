@@ -781,69 +781,55 @@ function initWordSearch() {
 
 
 /* ================================================================
-   4. LEADERBOARD — Supabase (online, semua device)
-   ================================================================
-   GANTI dua nilai di bawah dengan Project URL dan anon/public key
-   dari Supabase. JANGAN pernah memasukkan service_role key di sini.
-   ---------------------------------------------------------------- */
+   4. LEADERBOARD — Google Sheets
+   ================================================================ */
 
-const SUPABASE_URL = 'https://fcetqqzeffphwycfcmaf.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Jgb2vSIsnPL6T8b6Lxlhig_cRYRbUe5';
+const GOOGLE_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbxx2QrKiA3O58kK6Wh3YK8TAhtc23Hpnh6UQoXD99skBcv818sUQPe5DrHofYYV03aN/exec';
 
 const LB_MAX_ENTRIES = 10;
 let lbActiveTab = 'crossword';
 let lbLastSavedTimestamp = null;
 
-function supabaseReady() {
-  return SUPABASE_URL.includes('.supabase.co') &&
-         SUPABASE_ANON_KEY &&
-         SUPABASE_ANON_KEY.length > 50;
-}
 
-function supabaseReady() {
-  return SUPABASE_URL.includes('.supabase.co') &&
-         SUPABASE_ANON_KEY &&
-         SUPABASE_ANON_KEY.length > 50;
-}
-
+/* Ambil semua data dari Google Sheets */
 async function getLeaderboard(game) {
-  if (!supabaseReady()) {
-    console.error('Supabase belum dikonfigurasi. Isi SUPABASE_URL dan SUPABASE_ANON_KEY di script.js.');
-    return [];
-  }
-
   try {
-    const url = new URL(`${SUPABASE_URL}/rest/v1/leaderboard`);
-    url.searchParams.set('game', `eq.${game}`);
-    url.searchParams.set('select', 'id,game,name,seconds,score,ts');
-    url.searchParams.set('order', 'seconds.asc,score.desc');
-    url.searchParams.set('limit', String(LB_MAX_ENTRIES));
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: supabaseHeaders()
-    });
+    const response = await fetch(GOOGLE_SCRIPT_URL);
 
     if (!response.ok) {
-      console.error('Supabase GET error:', await response.text());
+      console.error('Google Sheets GET error:', response.status);
       return [];
     }
 
-    return await response.json();
-  } catch (e) {
-    console.error('Gagal mengambil leaderboard:', e);
+    const data = await response.json();
+
+    // Filter berdasarkan game
+    return data
+      .filter(entry => entry.game === game)
+      .sort((a, b) => {
+        // Waktu lebih cepat = ranking lebih tinggi
+        if (a.seconds !== b.seconds) {
+          return a.seconds - b.seconds;
+        }
+
+        // Kalau waktu sama, skor lebih tinggi = lebih tinggi
+        return b.score - a.score;
+      })
+      .slice(0, LB_MAX_ENTRIES);
+
+  } catch (error) {
+    console.error('Gagal mengambil leaderboard:', error);
     return [];
   }
 }
 
+
+/* Simpan skor ke Google Sheets */
 async function saveToLeaderboard(game, name, seconds, score) {
-  if (!supabaseReady()) {
-    console.error('Supabase belum dikonfigurasi.');
-    return false;
-  }
 
   const entry = {
-    game,
+    game: game,
     name: name.slice(0, 18),
     seconds: Math.max(0, Math.floor(seconds)),
     score: Math.floor(score),
@@ -851,79 +837,135 @@ async function saveToLeaderboard(game, name, seconds, score) {
   };
 
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      headers: supabaseHeaders({ 'Prefer': 'return=minimal' }),
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
       body: JSON.stringify(entry)
     });
 
     if (!response.ok) {
-      console.error('Supabase POST error:', await response.text());
+      console.error('Google Sheets POST error:', response.status);
+      return false;
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      console.error('Google Sheets gagal:', result.error);
       return false;
     }
 
     lbLastSavedTimestamp = entry.ts;
+
     await renderLeaderboard(game);
+
     return true;
-  } catch (e) {
-    console.error('Gagal menyimpan leaderboard:', e);
+
+  } catch (error) {
+    console.error('Gagal menyimpan leaderboard:', error);
     return false;
   }
 }
 
+
+/* Render leaderboard */
 async function renderLeaderboard(game) {
   lbActiveTab = game;
+
   const listEl = document.getElementById('lb-list');
   const emptyEl = document.getElementById('lb-empty');
 
-  document.querySelectorAll('.lb-tab').forEach(btn =>
-    btn.classList.toggle('active', btn.dataset.lb === game));
+  document.querySelectorAll('.lb-tab').forEach(btn => {
+    btn.classList.toggle(
+      'active',
+      btn.dataset.lb === game
+    );
+  });
 
-  listEl.innerHTML = '<li class="lb-loading">Memuat leaderboard...</li>';
+  listEl.innerHTML =
+    '<li class="lb-loading">Memuat leaderboard...</li>';
 
   const data = await getLeaderboard(game);
+
   listEl.innerHTML = '';
 
   if (data.length === 0) {
+
     emptyEl.hidden = false;
-    emptyEl.textContent = supabaseReady()
-      ? 'Belum ada skor untuk game ini.'
-      : 'Leaderboard belum dikonfigurasi. Isi Supabase URL dan anon key di script.js.';
+    emptyEl.textContent =
+      'Belum ada skor untuk game ini.';
+
     return;
   }
 
   emptyEl.hidden = true;
 
   const medals = ['🥇', '🥈', '🥉'];
+
   data.forEach((entry, i) => {
+
     const li = document.createElement('li');
-    if (entry.ts === lbLastSavedTimestamp) li.classList.add('you');
+
+    if (entry.ts === lbLastSavedTimestamp) {
+      li.classList.add('you');
+    }
+
     li.innerHTML = `
-      <span class="lb-rank">${medals[i] || (i + 1)}</span>
-      <span class="lb-name">${escapeHtml(entry.name)}</span>
-      <span class="lb-time">⏱ ${formatTime(entry.seconds)}</span>
-      <span class="lb-score">⭐ ${entry.score}</span>
+      <span class="lb-rank">
+        ${medals[i] || (i + 1)}
+      </span>
+
+      <span class="lb-name">
+        ${escapeHtml(entry.name)}
+      </span>
+
+      <span class="lb-time">
+        ⏱ ${formatTime(entry.seconds)}
+      </span>
+
+      <span class="lb-score">
+        ⭐ ${entry.score}
+      </span>
     `;
+
     listEl.appendChild(li);
   });
 }
 
-// Mencegah nama pemain menyisipkan tag HTML ke halaman
+
+/* Mencegah HTML injection dari nama pemain */
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
 
+
+/* Ganti tab leaderboard */
 function switchLeaderboardTab(game) {
   renderLeaderboard(game);
 }
 
+
+/* Tombol tab Crossword / Word Search */
 document.querySelectorAll('.lb-tab').forEach(btn => {
-  btn.addEventListener('click', () => switchLeaderboardTab(btn.dataset.lb));
+
+  btn.addEventListener('click', () => {
+    switchLeaderboardTab(btn.dataset.lb);
+  });
+
 });
 
-// Saat masuk ke halaman leaderboard lewat tombol beranda, ambil data terbaru dari Supabase.
-document.querySelectorAll('[data-target="leaderboard"]').forEach(el => {
-  el.addEventListener('click', () => renderLeaderboard(lbActiveTab));
+
+/* Saat membuka halaman leaderboard */
+document.querySelectorAll(
+  '[data-target="leaderboard"]'
+).forEach(el => {
+
+  el.addEventListener('click', () => {
+    renderLeaderboard(lbActiveTab);
+  });
+
 });
