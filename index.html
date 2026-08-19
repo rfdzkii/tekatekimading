@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Mading Digital — Cinta Lingkungan, Cinta Tanah Air</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Latar dekoratif (titik-titik hijau ala papan mading) -->
+<div class="bg-pattern" aria-hidden="true"></div>
+
+<!-- ============================================================ -->
+<!-- BERANDA                                                       -->
+<!-- ============================================================ -->
+<main id="view-home" class="view active">
+  <div class="home-wrap">
+    <div class="home-hero">
+      <span class="eyebrow">🌿 Mading Digital Kelas</span>
+      <h1 class="hero-title">Menjaga Lingkungan<br><span>adalah Bentuk Cinta Tanah Air</span></h1>
+      <p class="hero-sub">Pilih salah satu permainan di bawah ini. Setiap tantangan yang kamu selesaikan
+        adalah pengingat kecil untuk merawat bumi Indonesia.</p>
+    </div>
+
+    <div class="game-picker">
+      <button class="game-card" data-target="crossword" style="--rot:-2.5deg">
+        <span class="pin"></span>
+        <span class="tape"></span>
+        <span class="game-icon">🧩</span>
+        <h2>Teka-Teki Silang</h2>
+        <p>Isi kotak kosong menggunakan petunjuk mendatar &amp; menurun bertema lingkungan.</p>
+        <span class="card-cta">Play Crossword <span class="arrow">→</span></span>
+      </button>
+
+      <button class="game-card" data-target="wordsearch" style="--rot:1.8deg">
+        <span class="pin"></span>
+        <span class="tape"></span>
+        <span class="game-icon">🔎</span>
+        <h2>Cari Kata</h2>
+        <p>Temukan kata-kata tersembunyi tentang alam &amp; Indonesia di tumpukan huruf.</p>
+        <span class="card-cta">Play Word Search <span class="arrow">→</span></span>
+      </button>
+    </div>
+
+    <p class="home-footnote">👆 Sentuh atau klik salah satu kartu untuk mulai bermain</p>
+
+    <button class="btn-leaderboard-link" data-target="leaderboard">🏆 Lihat Leaderboard</button>
+  </div>
+</main>
+
+<!-- ============================================================ -->
+<!-- GAME 1 — TEKA-TEKI SILANG                                     -->
+<!-- ============================================================ -->
+<section id="view-crossword" class="view">
+  <header class="game-header">
+    <button class="btn-back" data-target="home">← Beranda</button>
+    <h2>Teka-Teki Silang</h2>
+    <div class="stat-tags">
+      <span class="tag">⏱ <span id="cw-timer">00:00</span></span>
+      <span class="tag">⭐ <span id="cw-score">0</span></span>
+    </div>
+  </header>
+
+  <p class="hint-text">💡 Klik salah satu kotak lalu ketik huruf. Gunakan panah keyboard untuk pindah kotak,
+    atau klik daftar petunjuk untuk melompat langsung.</p>
+
+  <div class="crossword-layout">
+    <div class="crossword-grid-wrap">
+      <div id="crossword-grid" class="crossword-grid"></div>
+
+      <div class="cw-controls">
+        <button id="cw-check" class="btn btn-primary">Check Answer</button>
+        <button id="cw-hint" class="btn btn-secondary">Hint</button>
+        <button id="cw-reset" class="btn btn-ghost">Reset</button>
+      </div>
+      <p id="cw-feedback" class="feedback" role="status"></p>
+    </div>
+
+    <div class="clues-panel">
+      <div class="clue-group">
+        <h3>Mendatar →</h3>
+        <ul id="clues-across"></ul>
+      </div>
+      <div class="clue-group">
+        <h3>Menurun ↓</h3>
+        <ul id="clues-down"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- GAME 2 — CARI KATA                                            -->
+<!-- ============================================================ -->
+<section id="view-wordsearch" class="view">
+  <header class="game-header">
+    <button class="btn-back" data-target="home">← Beranda</button>
+    <h2>Cari Kata</h2>
+    <div class="stat-tags">
+      <span class="tag">⏱ <span id="ws-timer">00:00</span></span>
+      <span class="tag">⭐ <span id="ws-score">0</span></span>
+      <span class="tag">✅ <span id="ws-found">0</span>/<span id="ws-total">0</span></span>
+    </div>
+  </header>
+
+  <p class="hint-text">💡 Temukan semua kata tersembunyi! Klik lalu seret jarimu/kursor melewati huruf-hurufnya,
+    atau ketuk huruf awal lalu ketuk huruf akhir.</p>
+
+  <div class="wordsearch-layout">
+    <div class="ws-grid-wrap">
+      <div id="ws-grid" class="ws-grid"></div>
+      <div class="ws-controls">
+        <button id="ws-new" class="btn btn-primary">New Game</button>
+        <button id="ws-reset" class="btn btn-ghost">Reset</button>
+      </div>
+    </div>
+
+    <div class="ws-words-panel">
+      <h3>Daftar Kata</h3>
+      <ul id="ws-word-list"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LEADERBOARD                                                   -->
+<!-- ============================================================ -->
+<section id="view-leaderboard" class="view">
+  <header class="game-header">
+    <button class="btn-back" data-target="home">← Beranda</button>
+    <h2>🏆 Leaderboard</h2>
+  </header>
+
+  <p class="hint-text">💡 Peringkat diurutkan berdasarkan waktu tercepat menyelesaikan permainan.</p>
+
+  <div class="lb-wrap">
+    <div class="lb-tabs">
+      <button class="lb-tab active" data-lb="crossword">🧩 Teka-Teki Silang</button>
+      <button class="lb-tab" data-lb="wordsearch">🔎 Cari Kata</button>
+    </div>
+
+    <ol id="lb-list" class="lb-list">
+      <!-- diisi otomatis oleh JavaScript -->
+    </ol>
+    <p id="lb-empty" class="lb-empty" hidden>Belum ada yang menyelesaikan permainan ini. Jadilah yang pertama!</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- MODAL KEMENANGAN (dipakai bersama oleh kedua game)            -->
+<!-- ============================================================ -->
+<div id="win-modal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-confetti">🎉🌿🎉</div>
+    <h2>Congratulations!</h2>
+    <p id="win-message">You completed the puzzle!</p>
+    <div class="modal-stats">
+      <div><span id="win-time">00:00</span><small>Waktu</small></div>
+      <div><span id="win-score">0</span><small>Skor</small></div>
+    </div>
+
+    <div class="modal-save">
+      <label for="win-name">Masukkan namamu untuk leaderboard</label>
+      <input id="win-name" type="text" maxlength="18" placeholder="Nama kamu">
+      <button id="win-save" class="btn btn-secondary">Simpan Skor</button>
+      <p id="win-save-msg"></p>
+    </div>
+
+    <div class="modal-actions">
+      <button id="win-leaderboard" class="btn btn-primary">Lihat Leaderboard</button>
+      <button id="win-close" class="btn btn-ghost">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
