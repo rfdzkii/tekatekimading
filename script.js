@@ -172,7 +172,7 @@ const CROSSWORD_WORDS = [
     row: 1,
     col: 2,
     answer: 'INDONESIA',
-    clue: 'Negara tempat kita tinggal, terdiri dari ribuan pulau dan memiliki banyak keanekaragaman hayati. Disuruh ganti gavin'
+    clue: 'Negara tempat kita tinggal, terdiri dari ribuan pulau dan memiliki banyak keanekaragaman hayati. Disuruh'
   },
   {
     num: 4,
