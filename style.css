@@ -29,6 +29,12 @@
   --font-display: 'Baloo 2', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
+@font-face {
+    font-family: "Minecraft";
+    src: url("fonts/Minecraft.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
 
 *{ box-sizing: border-box; }
 html,body{ height:100%; }
@@ -54,7 +60,7 @@ body{
 
 button{ font-family: inherit; cursor:pointer; }
 ul{ list-style:none; margin:0; padding:0; }
-h1,h2,h3{ font-family: var(--font-display); margin:0; }
+h1,h2,h3{ font-family: "Minecraft", system-ui, sans-serif; margin:0; }
 
 /* ============================================================
    VIEW SWITCHING
