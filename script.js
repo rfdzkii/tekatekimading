@@ -172,7 +172,7 @@ const CROSSWORD_WORDS = [
     row: 1,
     col: 2,
     answer: 'INDONESIA',
-    clue: 'Negara tempat kita tinggal, terdiri dari ribuan pulau dan memiliki banyak keanekaragaman hayati. Disuruh'
+    clue: 'Negara tempat kita tinggal, terdiri dari ribuan pulau dan memiliki banyak keanekaragaman hayati.'
   },
   {
     num: 4,
@@ -744,7 +744,7 @@ function checkCwSilently() {
 
     showWinModal(
       'crossword',
-      'Kamu berhasil menyelesaikan teka-teki silang!',
+      'Kamu berhasil nyelesain teka teki silang. wwowowowo!!',
       cwTimer.getSeconds(),
       cwScore
     );
@@ -1877,7 +1877,7 @@ function finalizeWsSelection(
 
       showWinModal(
         'wordsearch',
-        'Kamu berhasil menemukan semua kata!',
+        'Kamu berhasil nemuin kata-katanyaaaaaa wowowowo!',
         wsTimer.getSeconds(),
         wsScore
       );
